@@ -1,14 +1,11 @@
 const express = require("express");
 const path = require("path");
-
 const { open } = require("sqlite");
 const sqlite3 = require("sqlite3");
 const app = express();
-
-const dbPath = path.join(__dirname, "cricketMatchDetails.db");
-
+app.use(express.json());
+const dbPath = path.join(__dirname, "cricketTeam.db");
 let db = null;
-
 const initializeDBAndServer = async () => {
   try {
     db = await open({
@@ -75,7 +72,7 @@ app.get("/players/:playerId/", async (request, response) => {
     WHERE
       player_id = ${playerId};`;
   const player = await db.get(getPlayerQuery);
-  response.send(convertDbObjectToResponseObject(eachPlayer));
+  response.send(convertDbObjectToResponseObject(player));
 });
 app.put("/players/:playerId/", async (request, response) => {
   const { playerId } = request.params;
@@ -99,7 +96,7 @@ app.delete("/players/:playerId/", async (request, response) => {
     DELETE FROM
       cricket_team
     WHERE
-      player_id = ${player_id};`;
+      playerId = ${playerId};`;
   await db.run(deletePlayerQuery);
   response.send("Player Removed");
 });
